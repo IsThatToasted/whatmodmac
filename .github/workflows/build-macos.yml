@@ -1,4 +1,3 @@
-
 name: Build WhatMod macOS
 
 on:
@@ -30,7 +29,6 @@ jobs:
             --noconfirm \
             --clean \
             --name "WhatMod" \
-            --icon=icon.icns \
             whatmod.py
 
       - name: Zip app
