@@ -1,0 +1,45 @@
+
+name: Build WhatMod macOS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller PySide6 playwright pillow pyperclip
+          playwright install chromium
+
+      - name: Build WhatMod
+        run: |
+          pyinstaller \
+            --windowed \
+            --noconfirm \
+            --clean \
+            --name "WhatMod" \
+            --icon=icon.icns \
+            whatmod.py
+
+      - name: Zip app
+        run: |
+          cd dist
+          zip -r WhatMod-macOS.zip WhatMod.app
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WhatMod-macOS
+          path: dist/WhatMod-macOS.zip
