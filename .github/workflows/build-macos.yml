@@ -20,21 +20,36 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pyinstaller PySide6 playwright pillow pyperclip
-          playwright install chromium
+          python -m playwright install chromium
 
-      - name: Build WhatMod
+      - name: Build WhatMod app
         run: |
           pyinstaller \
             --windowed \
             --noconfirm \
             --clean \
+            --onedir \
             --name "WhatMod" \
             whatmod.py
 
-      - name: Zip app
+      - name: Ad-hoc sign WhatMod app
+        run: |
+          codesign --force --deep --sign - dist/WhatMod.app
+
+      - name: Remove quarantine attributes
+        run: |
+          xattr -cr dist/WhatMod.app || true
+
+      - name: Verify app bundle
+        run: |
+          test -d dist/WhatMod.app
+          test -f dist/WhatMod.app/Contents/MacOS/WhatMod
+          ls -la dist/WhatMod.app/Contents/MacOS
+
+      - name: Zip app correctly for macOS
         run: |
           cd dist
-          zip -r WhatMod-macOS.zip WhatMod.app
+          ditto -c -k --keepParent WhatMod.app WhatMod-macOS.zip
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
