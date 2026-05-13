@@ -1,3 +1,4 @@
+```yaml
 name: Build WhatMod macOS
 
 on:
@@ -8,21 +9,34 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller PySide6 playwright pillow pyperclip
+
+          pip install \
+            pyinstaller \
+            PySide6 \
+            playwright \
+            pillow \
+            pyperclip
+
           python -m playwright install chromium
 
-      - name: Build WhatMod app
+      - name: Verify required files exist
+        run: |
+          test -f whatmod.py
+          test -f cover.png
+          test -f assets/icon.icns
+
+      - name: Build WhatMod macOS app
         run: |
           pyinstaller \
             --windowed \
@@ -30,11 +44,18 @@ jobs:
             --clean \
             --onedir \
             --name "WhatMod" \
+            --icon=assets/icon.icns \
+            --add-data "cover.png:." \
+            --add-data "assets:assets" \
             whatmod.py
 
-      - name: Ad-hoc sign WhatMod app
+      - name: Ad-hoc sign app bundle
         run: |
-          codesign --force --deep --sign - dist/WhatMod.app
+          codesign \
+            --force \
+            --deep \
+            --sign - \
+            dist/WhatMod.app
 
       - name: Remove quarantine attributes
         run: |
@@ -44,15 +65,21 @@ jobs:
         run: |
           test -d dist/WhatMod.app
           test -f dist/WhatMod.app/Contents/MacOS/WhatMod
+
+          echo "==== APP CONTENTS ===="
           ls -la dist/WhatMod.app/Contents/MacOS
 
-      - name: Zip app correctly for macOS
+          echo "==== RESOURCES ===="
+          ls -la dist/WhatMod.app/Contents/Resources || true
+
+      - name: Zip app properly for macOS
         run: |
           cd dist
           ditto -c -k --keepParent WhatMod.app WhatMod-macOS.zip
 
-      - name: Upload artifact
+      - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
           name: WhatMod-macOS
           path: dist/WhatMod-macOS.zip
+```
