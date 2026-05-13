@@ -24,9 +24,31 @@ jobs:
 
       - name: Verify required files exist
         run: |
-          test -f whatmod.py
-          test -f cover.png
-          test -f assets/icon.icns
+          echo "Current directory:"
+          pwd
+
+          echo "Repo root:"
+          ls -la
+
+          echo "Assets folder:"
+          ls -la assets || true
+
+          if [ ! -f "whatmod.py" ]; then
+            echo "ERROR: whatmod.py is missing from repo root"
+            exit 1
+          fi
+
+          if [ ! -f "cover.png" ]; then
+            echo "ERROR: cover.png is missing from repo root"
+            exit 1
+          fi
+
+          if [ ! -f "assets/icon.icns" ]; then
+            echo "ERROR: assets/icon.icns is missing"
+            exit 1
+          fi
+
+          echo "All required files found."
 
       - name: Build WhatMod macOS app
         run: |
