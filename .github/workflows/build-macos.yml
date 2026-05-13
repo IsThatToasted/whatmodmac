@@ -43,8 +43,8 @@ jobs:
             exit 1
           fi
 
-          if [ ! -f "assets/icon.icns" ]; then
-            echo "ERROR: assets/icon.icns is missing"
+          if [ ! -f "whatmod_license_secret.key" ]; then
+            echo "ERROR: whatmod_license_secret.key is missing from repo root"
             exit 1
           fi
 
@@ -59,6 +59,7 @@ jobs:
             --onedir \
             --name "WhatMod" \
             --add-data "cover.png:." \
+            --add-data "whatmod_license_secret.key:." \
             --add-data "assets:assets" \
             whatmod.py
 
