@@ -36,7 +36,6 @@ jobs:
             --clean \
             --onedir \
             --name "WhatMod" \
-            --icon=assets/icon.icns \
             --add-data "cover.png:." \
             --add-data "assets:assets" \
             whatmod.py
